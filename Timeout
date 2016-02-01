@@ -1,0 +1,19 @@
+eval {
+    local $SIG{ ALRM } = sub { die "TIMEOUT" };
+    alarm 3 * 60;
+    for (my $i = 0 ; $i <$QUOTA ; $i++) {
+        build_dyna_file($i);
+        comp_simu_exe;
+        bin2txt2errormap($i);
+    }
+    alarm 0;
+};
+
+if ( $@ && $@ =~ m/TIMEOUT/ ) {
+    warn "operation timed out";
+}
+else {
+    # somebody else died
+    alarm 0;
+    die $@;
+}
